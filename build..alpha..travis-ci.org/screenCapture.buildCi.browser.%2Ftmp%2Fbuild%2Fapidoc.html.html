@@ -1,0 +1,137 @@
+<html><head></head><body><div class="apidocDiv">
+<style>
+/*csslint
+*/
+.apidocDiv {
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.apidocDiv a[href] {
+    color: #33f;
+    font-weight: bold;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocCodeCommentSpan {
+    background: #bbf;
+    color: #000;
+    display: block;
+}
+.apidocCodeKeywordSpan {
+    color: #d00;
+    font-weight: bold;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    color: #777;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleLi {
+    margin-top: 10px;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #777;
+    font-weight: bold;
+}
+</style>
+<h1>api documentation for
+    <a href="http://github.com/battlejj/express-force-ssl">express-force-ssl (v0.3.2)</a>
+</h1>
+<h4>Force SSL on particular/all pages in Express</h4>
+<div class="apidocSectionDiv"><a href="#apidoc.tableOfContents" id="apidoc.tableOfContents"><h1>table of contents</h1></a><ol>
+
+    <li class="apidocModuleLi"><a href="#apidoc.module.express-force-ssl">module express-force-ssl</a><ol>
+
+        <li>
+
+            <a class="apidocElementLiA" href="#apidoc.element.express-force-ssl.express-force-ssl">
+            function <span class="apidocSignatureSpan"></span>express-force-ssl
+            <span class="apidocSignatureSpan">(req, res, next)</span>
+            </a>
+
+        </li>
+
+    </ol></li>
+
+</ol></div>
+
+<div class="apidocSectionDiv">
+<h1><a href="#apidoc.module.express-force-ssl" id="apidoc.module.express-force-ssl">module express-force-ssl</a></h1>
+
+
+    <h2>
+        <a href="#apidoc.element.express-force-ssl.express-force-ssl" id="apidoc.element.express-force-ssl.express-force-ssl">
+        function <span class="apidocSignatureSpan"></span>express-force-ssl
+        <span class="apidocSignatureSpan">(req, res, next)</span>
+        </a>
+    </h2>
+    <ul>
+    <li>description and source-code<pre class="apidocCodePre">express-force-ssl = function (req, res, next){
+  var redirect;
+  var secure;
+  var xfpHeader = req.get('X-Forwarded-Proto');
+  var localHttpsPort;
+  var appHttpsPort = req.app.get('httpsPort');
+  var httpsPort;
+  var fullUrl;
+  var redirectUrl;
+
+  var options = {
+    trustXFPHeader: false,
+    enable301Redirects: true,
+    httpsPort: false,
+    sslRequiredMessage: 'SSL Required.'
+  };
+
+  var expressOptions = req.app.get('forceSSLOptions') || {};
+  var localOptions = res.locals.forceSSLOptions || {};
+  localHttpsPort = localOptions.httpsPort;
+  assign(options, expressOptions, localOptions);
+
+  secure = isSecure(req.secure, xfpHeader, options.trustXFPHeader);
+  redirect = shouldRedirect(options.enable301Redirects, req.method);
+
+  if (!secure) {
+    if (redirect) {
+      checkForDeprecation(req.app, options.httpsPort);
+
+      httpsPort = localHttpsPort || options.httpsPort || appHttpsPort || 443;
+      fullUrl = parseUrl(req.protocol + '://' + req.header('Host') + req.originalUrl);
+
+      //intentionally allow coercion of https port
+      redirectUrl = 'https://' + fullUrl.hostname + (httpsPort == 443 ? '' : (':' + httpsPort)) + req.originalUrl;
+
+      res.redirect(301, redirectUrl);
+    } else {
+      res.status(403).send(options.sslRequiredMessage);
+    }
+  } else {
+    delete res.locals.forceSSLOptions;
+    next();
+  }
+}</pre></li>
+    <li>example usage<pre class="apidocCodePre">n/a</pre></li>
+    </ul>
+
+
+</div>
+
+<div class="apidocFooterDiv">
+    [ this document was created with
+    <a href="https://github.com/kaizhu256/node-utility2" target="_blank">utility2</a>
+    ]
+</div>
+</div>
+</body></html>
